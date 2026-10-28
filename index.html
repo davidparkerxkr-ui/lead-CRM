@@ -1,0 +1,1739 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<link rel="icon" href="data:," />
+<title>Lead CRM — Truck Dispatch Dialer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#060607;
+    --bg2:#0b0b0d;
+    --panel:#101013;
+    --panel2:#151519;
+    --panel3:#1b1b21;
+    --line:#232329;
+    --line2:#2e2e37;
+    --txt:#f2f1ec;
+    --muted:#a7a49b;
+    --dim:#6f6d66;
+    --amber:#ffb224;
+    --amber2:#ff8a3d;
+    --amber-soft:rgba(255,178,36,.12);
+    --teal:#2dd4bf;
+    --teal-soft:rgba(45,212,191,.10);
+    --red:#ff5d5d;
+    --red-soft:rgba(255,93,93,.10);
+    --green:#4ade80;
+    --green-soft:rgba(74,222,128,.10);
+    --blue:#5eb1ff;
+    --blue-soft:rgba(94,177,255,.10);
+    --radius:14px;
+    --font:'Sora',system-ui,-apple-system,'Segoe UI',sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+
+  /* ---------- themes: black (default) / white / gray / graphite / navy ---------- */
+  [data-theme="white"]{
+    --bg:#f4f4f2; --bg2:#ffffff; --panel:#ffffff; --panel2:#f0f0ee; --panel3:#e8e8e6;
+    --line:#d8d8d4; --line2:#c2c2be; --txt:#141414; --muted:#5a5a55; --dim:#8a8a84;
+  }
+  [data-theme="gray"]{
+    --bg:#e2e2e0; --bg2:#ececea; --panel:#f2f2f0; --panel2:#e6e6e4; --panel3:#dcdcd8;
+    --line:#c8c8c4; --line2:#b0b0ac; --txt:#1c1c1c; --muted:#555550; --dim:#888882;
+  }
+  [data-theme="graphite"]{
+    --bg:#1d1d21; --bg2:#242429; --panel:#2b2b31; --panel2:#323238; --panel3:#3a3a41;
+    --line:#3d3d45; --line2:#4a4a54; --txt:#f0f0ee; --muted:#b0aea6; --dim:#7d7b74;
+  }
+  [data-theme="navy"]{
+    --bg:#08101f; --bg2:#0b1628; --panel:#101e36; --panel2:#152642; --panel3:#1b2f4d;
+    --line:#22395c; --line2:#2c4a75; --txt:#eef2f8; --muted:#a8b6cc; --dim:#6f819e;
+  }
+  [data-theme="white"] #bgfx, [data-theme="gray"] #bgfx{opacity:.25;}
+  [data-theme="white"] .glow, [data-theme="gray"] .glow{opacity:.08;}
+  [data-theme="white"] .road, [data-theme="gray"] .road, [data-theme="white"] .vig, [data-theme="gray"] .vig{display:none;}
+  [data-theme="white"] .hero, [data-theme="gray"] .hero{
+    background:linear-gradient(100deg,#ffffff 30%,#f0f0ee 65%,#e8e8e6),var(--panel);
+    color:var(--txt);
+  }
+  [data-theme="white"] .hero .htxt h2, [data-theme="gray"] .hero .htxt h2{color:#141414;}
+  [data-theme="white"] .track, [data-theme="gray"] .track{background:#dcdcd8;}
+  [data-theme="white"] .leadcard, [data-theme="gray"] .leadcard{
+    background:linear-gradient(150deg,var(--amber) 0%,#d8d8d4 32%,#e8e8e6 60%,var(--amber2) 130%);
+  }
+  body, .stat, .leadinner, .hero, .tabs, .btn, .lcard{transition:background-color .35s ease,color .35s ease,border-color .35s ease;}
+  .lcard:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.14);}
+  .company, .hero .htxt h2{letter-spacing:-.3px;}
+  .themebox{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);font-weight:600;}
+  .themebox select{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);border-radius:10px;padding:8px 10px;font-weight:600;cursor:pointer;}
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;background:var(--bg);color:var(--txt);
+    font-family:var(--font);font-size:15px;line-height:1.5;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  ::selection{background:var(--amber);color:#111;}
+  button{font-family:inherit;cursor:pointer;}
+  input,select,textarea{font-family:inherit;color:var(--txt);}
+  a{color:var(--amber);}
+
+  /* ---------- animated night-highway backdrop ---------- */
+  #bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+  #stars{position:absolute;inset:0;width:100%;height:100%;}
+  .glow{position:absolute;border-radius:50%;filter:blur(90px);opacity:.16;}
+  .glow.g1{width:520px;height:520px;background:#ff8a3d;top:-180px;right:-120px;animation:drift1 26s ease-in-out infinite alternate;}
+  .glow.g2{width:420px;height:420px;background:#0f766e;bottom:-160px;left:-140px;animation:drift2 32s ease-in-out infinite alternate;}
+  @keyframes drift1{from{transform:translate(0,0)}to{transform:translate(-90px,60px)}}
+  @keyframes drift2{from{transform:translate(0,0)}to{transform:translate(80px,-50px)}}
+  .road{position:absolute;left:0;right:0;bottom:0;height:120px;
+    background:linear-gradient(to top,rgba(255,178,36,.07),transparent 70%);}
+  .road::before{content:"";position:absolute;left:0;right:0;bottom:34px;height:2px;
+    background:repeating-linear-gradient(90deg,var(--amber) 0 46px,transparent 46px 92px);
+    opacity:.35;animation:roadmove 1.1s linear infinite;}
+  @keyframes roadmove{from{background-position-x:0}to{background-position-x:-92px}}
+  .vig{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 0%,transparent 55%,rgba(0,0,0,.55));}
+
+  .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:18px 18px 90px;}
+
+  /* ---------- top toolbar ---------- */
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .brand{display:flex;align-items:center;gap:12px;min-width:0;}
+  .brand .mark{width:40px;height:40px;border-radius:11px;flex:none;
+    background:linear-gradient(140deg,var(--amber),var(--amber2));
+    display:flex;align-items:center;justify-content:center;color:#161006;
+    box-shadow:0 6px 22px rgba(255,150,40,.35);}
+  .brand h1{font-size:19px;margin:0;font-weight:800;letter-spacing:.2px;line-height:1.15;}
+  .brand p{margin:0;color:var(--muted);font-size:12.5px;}
+  .tools{display:flex;flex-wrap:wrap;gap:8px;}
+  .btn{
+    display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line2);
+    background:var(--panel2);color:var(--txt);border-radius:10px;
+    padding:9px 13px;font-size:13.5px;font-weight:600;transition:.18s;
+  }
+  .btn:hover{border-color:var(--amber);color:var(--amber);transform:translateY(-1px);}
+  .btn:active{transform:translateY(0) scale(.98);}
+  .btn.primary{background:linear-gradient(140deg,var(--amber),var(--amber2));border-color:transparent;color:#171106;}
+  .btn.primary:hover{color:#171106;filter:brightness(1.07);}
+  .btn svg{flex:none;}
+
+  /* ---------- hero strip / goal ---------- */
+  .hero{
+    border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-bottom:16px;
+    background:
+      linear-gradient(100deg,rgba(6,6,7,.92) 30%,rgba(6,6,7,.55) 65%,rgba(6,6,7,.25)),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='300'%3E%3Cdefs%3E%3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%230a0f1e'/%3E%3Cstop offset='.7' stop-color='%23060707'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='300' fill='url(%23s)'/%3E%3Cg fill='%23ffffff'%3E%3Ccircle cx='80' cy='40' r='1.4'/%3E%3Ccircle cx='240' cy='90' r='1'/%3E%3Ccircle cx='420' cy='30' r='1.3'/%3E%3Ccircle cx='610' cy='70' r='1'/%3E%3Ccircle cx='760' cy='26' r='1.5'/%3E%3Ccircle cx='930' cy='60' r='1'/%3E%3Ccircle cx='1080' cy='34' r='1.3'/%3E%3Ccircle cx='520' cy='110' r='.9'/%3E%3Ccircle cx='150' cy='130' r='.9'/%3E%3Ccircle cx='1010' cy='120' r='.9'/%3E%3C/g%3E%3Cpath d='M0 300 L470 168 L730 168 L1200 300 Z' fill='%230c0c0e'/%3E%3Cpath d='M588 300 L598 190 L602 190 L612 300 Z' fill='%23ffb224' opacity='.85'/%3E%3Cpath d='M0 300 L470 168' stroke='%23222228' stroke-width='3'/%3E%3Cpath d='M1200 300 L730 168' stroke='%23222228' stroke-width='3'/%3E%3Cg stroke='%23ff8a3d' stroke-width='5' stroke-linecap='round' opacity='.8'%3E%3Cpath d='M120 268 L300 268'/%3E%3Cpath d='M880 268 L1070 268'/%3E%3C/g%3E%3C/svg%3E");
+    background-size:cover;background-position:center;
+    padding:20px 22px;display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between;
+  }
+  .hero .htxt h2{margin:0 0 4px;font-size:21px;font-weight:800;}
+  .hero .htxt p{margin:0;color:var(--muted);font-size:13.5px;max-width:520px;}
+  .goalbox{min-width:250px;flex:1;max-width:360px;}
+  .goalbox .grow{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--muted);margin-bottom:7px;}
+  .goalbox .grow b{color:var(--txt);font-size:16px;}
+  .goalbox .grow button{background:none;border:none;color:var(--amber);font-size:12.5px;font-weight:600;padding:0;}
+  .track{height:10px;border-radius:99px;background:#26262c;overflow:hidden;}
+  .track .fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--amber),var(--amber2));
+    width:0%;transition:width .7s cubic-bezier(.22,1,.36,1);box-shadow:0 0 14px rgba(255,160,50,.5);}
+
+  .statrow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:13px 15px;}
+  .stat .n{font-size:24px;font-weight:800;line-height:1.1;font-family:var(--mono);}
+  .stat .l{font-size:12px;color:var(--muted);margin-top:2px;}
+  .stat.amber .n{color:var(--amber);} .stat.teal .n{color:var(--teal);}
+  .stat.green .n{color:var(--green);} .stat.blue .n{color:var(--blue);}
+
+  /* ---------- tabs ---------- */
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;background:var(--panel);
+    border:1px solid var(--line);border-radius:13px;padding:5px;}
+  .tab{flex:1;min-width:96px;border:none;background:transparent;color:var(--muted);
+    padding:10px 8px;border-radius:9px;font-size:14px;font-weight:600;transition:.18s;position:relative;}
+  .tab:hover{color:var(--txt);}
+  .tab.on{background:var(--panel3);color:var(--txt);box-shadow:inset 0 0 0 1px var(--line2);}
+  .tab .badge{display:inline-block;min-width:20px;padding:1px 6px;margin-left:6px;border-radius:99px;
+    background:var(--amber);color:#171106;font-size:11px;font-weight:700;vertical-align:1px;}
+  .tab .badge.red{background:var(--red);color:#1c0505;}
+  .view{display:none;}
+  .view.on{display:block;animation:viewin .35s cubic-bezier(.22,1,.36,1);}
+  @keyframes viewin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  /* ---------- dialer ---------- */
+  .dialgrid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px;align-items:start;}
+  .leadcard{
+    border-radius:20px;padding:2px;position:relative;
+    background:linear-gradient(150deg,var(--amber) 0%,#3a3a42 32%,#232329 60%,var(--amber2) 130%);
+    animation:cardin .45s cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes cardin{from{opacity:0;transform:translateX(26px);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+  .leadcard.back{animation-name:cardinb;}
+  @keyframes cardinb{from{opacity:0;transform:translateX(-26px);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+  .leadinner{background:var(--bg2);border-radius:18px;padding:22px;}
+  .posrow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px;}
+  .pos{font-family:var(--mono);font-size:12.5px;color:var(--dim);}
+  .navbtns{display:flex;gap:6px;}
+  .iconbtn{width:34px;height:34px;border-radius:9px;border:1px solid var(--line2);background:var(--panel2);
+    color:var(--txt);display:inline-flex;align-items:center;justify-content:center;transition:.15s;}
+  .iconbtn:hover{border-color:var(--amber);color:var(--amber);}
+  .queuebar{height:5px;border-radius:99px;background:#222228;overflow:hidden;margin-bottom:16px;}
+  .queuebar i{display:block;height:100%;background:var(--teal);border-radius:99px;transition:width .5s cubic-bezier(.22,1,.36,1);}
+  .company{font-size:27px;font-weight:800;line-height:1.15;margin:0 0 2px;letter-spacing:-.2px;}
+  .contactline{color:var(--muted);font-size:15px;margin:0 0 14px;}
+  .contactline b{color:var(--txt);}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+  .chip{font-size:12px;font-weight:600;padding:4px 10px;border-radius:99px;border:1px solid var(--line2);
+    background:var(--panel2);color:var(--muted);}
+  .chip.hot{background:var(--amber-soft);border-color:rgba(255,178,36,.4);color:var(--amber);}
+  .chip.win{background:var(--green-soft);border-color:rgba(74,222,128,.35);color:var(--green);}
+  .chip.closed{background:var(--red-soft);border-color:rgba(255,93,93,.3);color:var(--red);}
+  .chip.info{background:var(--blue-soft);border-color:rgba(94,177,255,.3);color:var(--blue);}
+
+  .copystrip{
+    width:100%;display:flex;align-items:center;gap:12px;text-align:left;
+    background:var(--panel2);border:1px dashed #3d3d47;border-radius:13px;padding:13px 15px;margin-bottom:10px;transition:.15s;
+  }
+  .copystrip:hover{border-color:var(--amber);background:var(--amber-soft);}
+  .copystrip .ph{font-family:var(--mono);font-size:21px;font-weight:600;letter-spacing:.4px;color:var(--txt);}
+  .copystrip .hint{margin-left:auto;font-size:12px;color:var(--amber);font-weight:700;white-space:nowrap;}
+  .copystrip small{display:block;font-family:var(--font);font-size:11.5px;color:var(--dim);letter-spacing:0;}
+
+  .actionrow{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:9px;margin-bottom:9px;}
+  .actionrow2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:18px;}
+  .abtn{border-radius:12px;padding:13px 10px;font-size:14.5px;font-weight:700;border:1px solid var(--line2);
+    background:var(--panel2);color:var(--txt);display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.15s;}
+  .abtn:hover{transform:translateY(-1px);border-color:var(--line2);filter:brightness(1.15);}
+  .abtn:active{transform:scale(.97);}
+  .abtn.call{background:linear-gradient(140deg,var(--amber),var(--amber2));color:#171106;border-color:transparent;
+    box-shadow:0 8px 26px rgba(255,150,40,.30);font-size:15.5px;}
+  .abtn:disabled{opacity:.38;pointer-events:none;}
+  .abtn small{font-weight:600;font-size:11px;opacity:.75;}
+
+  .brief{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:15px 16px;margin-bottom:18px;}
+  .brief h3{margin:0 0 11px;font-size:13px;letter-spacing:1.1px;text-transform:uppercase;color:var(--amber);
+    display:flex;align-items:center;gap:8px;}
+  .briefgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px 18px;}
+  .briefgrid .it .k{font-size:11.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;}
+  .briefgrid .it .v{font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:7px;}
+  .mini-copy{border:none;background:none;color:var(--dim);padding:2px;border-radius:5px;display:inline-flex;}
+  .mini-copy:hover{color:var(--amber);background:var(--panel3);}
+  .brief .note{margin:11px 0 0;padding:10px 12px;background:var(--panel2);border-radius:9px;font-size:13.5px;color:var(--muted);}
+  .brief .note b{color:var(--txt);}
+
+  .secttl{font-size:13px;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:700;}
+  .outcomes{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:10px;}
+  .obtn{border-radius:12px;padding:13px 8px;font-size:14px;font-weight:700;border:1px solid var(--line2);
+    background:var(--panel2);color:var(--txt);transition:.15s;display:flex;flex-direction:column;align-items:center;gap:3px;}
+  .obtn small{font-size:11px;color:var(--dim);font-weight:600;}
+  .obtn:hover{transform:translateY(-1px);filter:brightness(1.2);}
+  .obtn:active{transform:scale(.97);}
+  .obtn.noans{border-color:rgba(94,177,255,.4);} .obtn.noans:hover{background:var(--blue-soft);}
+  .obtn.notint{border-color:rgba(255,93,93,.4);} .obtn.notint:hover{background:var(--red-soft);}
+  .obtn.inter{border-color:rgba(74,222,128,.45);} .obtn.inter:hover{background:var(--green-soft);}
+  .obtn.talk{border-color:rgba(45,212,191,.45);} .obtn.talk:hover{background:var(--teal-soft);}
+  .obtn.fup{border-color:rgba(255,178,36,.5);} .obtn.fup:hover{background:var(--amber-soft);}
+  .obtn.skipb{border-style:dashed;}
+  .outcomes2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px;}
+  .obtn.wrong,.obtn.dnc{flex-direction:row;justify-content:center;padding:10px 8px;font-size:13px;color:var(--muted);}
+  .obtn.dnc:hover{background:var(--red-soft);color:var(--red);}
+
+  .fupanel,.talkpanel{display:none;border:1px solid rgba(255,178,36,.45);background:var(--amber-soft);
+    border-radius:13px;padding:14px;margin-bottom:16px;animation:viewin .25s ease;}
+  .talkpanel{border-color:rgba(45,212,191,.4);background:var(--teal-soft);}
+  .fupanel.open,.talkpanel.open{display:block;}
+  .fupanel h4,.talkpanel h4{margin:0 0 10px;font-size:14px;}
+  .fushorts{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
+  .fushorts button{border:1px solid var(--line2);background:var(--panel2);color:var(--txt);border-radius:99px;
+    padding:7px 12px;font-size:13px;font-weight:600;}
+  .fushorts button:hover{border-color:var(--amber);color:var(--amber);}
+  .furow{display:flex;gap:8px;flex-wrap:wrap;}
+  .furow input{flex:1;min-width:180px;background:var(--panel);border:1px solid var(--line2);border-radius:10px;padding:10px 12px;font-size:14px;}
+  .objchips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;}
+  .objchips button{border:1px solid var(--line2);background:var(--panel);color:var(--muted);border-radius:99px;
+    padding:6px 11px;font-size:12.5px;font-weight:600;}
+  .objchips button:hover{color:var(--teal);border-color:var(--teal);}
+
+  textarea.notebox{width:100%;min-height:86px;background:var(--panel);border:1px solid var(--line2);
+    border-radius:12px;padding:12px 13px;font-size:14.5px;resize:vertical;margin-bottom:9px;}
+  textarea.notebox:focus{outline:none;border-color:var(--amber);}
+  .tplchips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px;}
+  .tplchips button{border:1px solid var(--line2);background:var(--panel2);color:var(--muted);border-radius:99px;
+    padding:6px 11px;font-size:12.5px;font-weight:600;transition:.15s;}
+  .tplchips button:hover{color:var(--amber);border-color:var(--amber);}
+
+  .side{display:flex;flex-direction:column;gap:16px;}
+  .sidecard{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;}
+  .sidecard h3{margin:0 0 12px;font-size:13px;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);}
+  .script{font-size:14px;color:var(--muted);background:var(--panel2);border-radius:10px;padding:12px 13px;margin-bottom:10px;}
+  .script b{color:var(--txt);}
+  .upnext{display:flex;flex-direction:column;gap:7px;}
+  .upitem{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--panel2);
+    border:1px solid var(--line);border-radius:10px;padding:9px 11px;color:var(--txt);transition:.15s;}
+  .upitem:hover{border-color:var(--amber);}
+  .upitem .nm{font-weight:600;font-size:13.5px;line-height:1.3;}
+  .upitem .mt{font-size:12px;color:var(--dim);font-family:var(--mono);}
+  .upitem .go{margin-left:auto;color:var(--amber);font-weight:700;font-size:12px;flex:none;}
+  .sessrow{display:flex;justify-content:space-between;font-size:13.5px;padding:5px 0;border-bottom:1px dashed var(--line);}
+  .sessrow:last-child{border-bottom:none;}
+  .sessrow b{font-family:var(--mono);}
+  .keys{font-size:12.5px;color:var(--dim);line-height:2;}
+  .keys kbd{font-family:var(--mono);background:var(--panel3);border:1px solid var(--line2);border-bottom-width:2px;
+    border-radius:5px;padding:1px 6px;color:var(--txt);font-size:11.5px;}
+
+  /* ---------- empty state ---------- */
+  .empty{border:1.5px dashed var(--line2);border-radius:18px;padding:44px 26px;text-align:center;background:var(--panel);}
+  .empty h2{margin:0 0 8px;font-size:22px;}
+  .empty p{color:var(--muted);max-width:520px;margin:0 auto 18px;}
+  .empty .big{font-size:15px;padding:14px 22px;}
+
+  /* ---------- leads grid ---------- */
+  .leadtools{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:14px;}
+  .leadtools input[type=search]{flex:1;min-width:200px;background:var(--panel);border:1px solid var(--line2);
+    border-radius:11px;padding:11px 13px;font-size:14.5px;}
+  .leadtools input:focus,.leadtools select:focus{outline:none;border-color:var(--amber);}
+  .leadtools select{background:var(--panel);border:1px solid var(--line2);border-radius:11px;padding:11px;font-size:14px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;}
+  .lcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:15px;transition:.18s;animation:viewin .3s ease;}
+  .lcard:hover{border-color:var(--line2);transform:translateY(-2px);}
+  .lcard h4{margin:0 0 2px;font-size:16px;}
+  .lcard .sub{color:var(--muted);font-size:13px;margin-bottom:9px;}
+  .lcard .meta{font-family:var(--mono);font-size:12.5px;color:var(--dim);display:flex;flex-wrap:wrap;gap:4px 12px;margin-bottom:10px;}
+  .lcard .rowbtns{display:flex;gap:6px;flex-wrap:wrap;}
+  .smbtn{border:1px solid var(--line2);background:var(--panel2);color:var(--txt);border-radius:8px;
+    padding:7px 10px;font-size:12.5px;font-weight:600;display:inline-flex;gap:5px;align-items:center;}
+  .smbtn:hover{border-color:var(--amber);color:var(--amber);}
+  .smbtn.danger:hover{border-color:var(--red);color:var(--red);}
+  .statuspill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;letter-spacing:.3px;}
+  .st-new{background:var(--panel3);color:var(--muted);}
+  .st-interested{background:var(--green-soft);color:var(--green);}
+  .st-followup{background:var(--amber-soft);color:var(--amber);}
+  .st-notint,.st-dnc{background:var(--red-soft);color:var(--red);}
+  .st-talked{background:var(--teal-soft);color:var(--teal);}
+  .st-noans{background:var(--blue-soft);color:var(--blue);}
+  .st-other{background:var(--panel3);color:var(--muted);}
+
+  /* ---------- follow-ups & today ---------- */
+  .fugroup{margin-bottom:20px;}
+  .fugroup h3{margin:0 0 10px;font-size:15px;display:flex;align-items:center;gap:8px;}
+  .fugroup h3 .cnt{font-size:12px;color:var(--dim);font-weight:600;}
+  .fuitem{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;padding:12px 14px;margin-bottom:8px;animation:viewin .3s ease;}
+  .fuitem.overdue{border-color:rgba(255,93,93,.5);}
+  .fuitem .who{flex:1;min-width:180px;}
+  .fuitem .who b{font-size:15px;}
+  .fuitem .who div{font-size:12.5px;color:var(--muted);}
+  .fuitem .when{font-family:var(--mono);font-size:13px;color:var(--amber);white-space:nowrap;}
+  .fuitem.overdue .when{color:var(--red);}
+  .logitem{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;background:var(--panel);
+    border:1px solid var(--line);border-radius:11px;padding:11px 14px;margin-bottom:7px;}
+  .logitem .t{font-family:var(--mono);font-size:12.5px;color:var(--dim);white-space:nowrap;}
+  .logitem .c{font-weight:600;}
+  .logitem .nt{width:100%;font-size:13px;color:var(--muted);}
+  .breakdown{display:flex;flex-direction:column;gap:8px;}
+  .bdrow{display:grid;grid-template-columns:130px 1fr 34px;gap:10px;align-items:center;font-size:13px;}
+  .bdrow .bar{height:8px;background:#222228;border-radius:99px;overflow:hidden;}
+  .bdrow .bar i{display:block;height:100%;border-radius:99px;transition:width .6s cubic-bezier(.22,1,.36,1);}
+  .bdrow .n{font-family:var(--mono);text-align:right;}
+  .exportrow{display:flex;flex-wrap:wrap;gap:9px;margin:14px 0 20px;}
+
+  /* ---------- templates ---------- */
+  .tplgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
+  .tplcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
+  .tplcard h4{margin:0 0 6px;font-size:15px;}
+  .tplcard p{margin:0 0 10px;font-size:13.5px;color:var(--muted);white-space:pre-wrap;}
+  .tplform{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;}
+  .tplform input,.tplform textarea{width:100%;background:var(--panel2);border:1px solid var(--line2);
+    border-radius:10px;padding:10px 12px;font-size:14px;margin-bottom:9px;}
+  .tplform textarea{min-height:74px;resize:vertical;}
+  .tplform input:focus,.tplform textarea:focus{outline:none;border-color:var(--amber);}
+  .fld label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600;letter-spacing:.4px;}
+
+  /* ---------- modal ---------- */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);z-index:50;
+    display:none;align-items:flex-start;justify-content:center;padding:26px 14px;overflow:auto;}
+  .overlay.open{display:flex;}
+  .modal{background:var(--bg2);border:1px solid var(--line2);border-radius:18px;max-width:560px;width:100%;
+    padding:24px;animation:viewin .3s cubic-bezier(.22,1,.36,1);}
+  .modal h2{margin:0 0 4px;font-size:19px;}
+  .modal .sub{color:var(--muted);font-size:13.5px;margin:0 0 16px;}
+  .modal .fld{margin-bottom:14px;}
+  .modal input,.modal select{width:100%;background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:11px 12px;font-size:14.5px;}
+  .check{display:flex;gap:10px;align-items:flex-start;font-size:14px;padding:7px 0;cursor:pointer;}
+  .check input{width:18px;height:18px;accent-color:var(--amber);flex:none;margin-top:2px;}
+  .steps{list-style:none;margin:0 0 6px;padding:0;counter-reset:st;}
+  .steps li{display:flex;gap:11px;padding:8px 0;font-size:14px;color:var(--muted);}
+  .steps li::before{counter-increment:st;content:counter(st);flex:none;width:24px;height:24px;border-radius:50%;
+    background:var(--amber-soft);color:var(--amber);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;}
+  .steps li b{color:var(--txt);}
+  .seg{display:flex;gap:7px;flex-wrap:wrap;}
+  .seg button{flex:1;min-width:130px;border:1px solid var(--line2);background:var(--panel2);color:var(--muted);
+    border-radius:11px;padding:11px;font-size:13.5px;font-weight:600;text-align:left;}
+  .seg button.on{border-color:var(--amber);color:var(--txt);background:var(--amber-soft);}
+  .seg button small{display:block;font-weight:400;font-size:12px;color:var(--dim);margin-top:2px;}
+
+  /* ---------- toast ---------- */
+  #toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,80px);z-index:99;
+    background:#1d1d12;border:1px solid var(--amber);color:var(--txt);border-radius:12px;
+    padding:12px 18px;font-size:14px;font-weight:600;box-shadow:0 14px 40px rgba(0,0,0,.6);
+    transition:transform .35s cubic-bezier(.22,1,.36,1),opacity .35s;opacity:0;max-width:92vw;text-align:center;}
+  #toast.show{transform:translate(-50%,0);opacity:1;}
+  #toast b{color:var(--amber);}
+
+  .hidden-input{display:none;}
+  .muted{color:var(--muted);} .small{font-size:12.5px;}
+
+  @media (max-width:920px){
+    .dialgrid{grid-template-columns:1fr;}
+    .tplgrid{grid-template-columns:1fr;}
+    .statrow{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (max-width:560px){
+    .wrap{padding:14px 12px 80px;}
+    .company{font-size:23px;}
+    .copystrip .ph{font-size:18px;}
+    .actionrow{grid-template-columns:1fr 1fr;}
+    .actionrow .call{grid-column:1/-1;}
+    .outcomes{grid-template-columns:repeat(2,1fr);}
+    .briefgrid{grid-template-columns:1fr 1fr;}
+    .hero{padding:16px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.001s !important;transition-duration:.001s !important;}
+  }
+</style>
+</head>
+<body>
+<div id="bgfx" aria-hidden="true">
+  <canvas id="stars"></canvas>
+  <div class="glow g1"></div><div class="glow g2"></div>
+  <div class="road"></div><div class="vig"></div>
+</div>
+
+<div class="wrap">
+
+  <!-- toolbar -->
+  <div class="toolbar">
+    <div class="brand">
+      <div class="mark">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      </div>
+      <div>
+        <h1>Lead CRM</h1>
+        <p>Truck dispatch power-dialer · RingCentral in Brave</p>
+      </div>
+    </div>
+    <div class="tools">
+      <label class="themebox">Theme
+        <select id="themeSelect" aria-label="Choose theme">
+          <option value="black">Black</option>
+          <option value="white">White</option>
+          <option value="gray">Gray</option>
+          <option value="graphite">Graphite</option>
+          <option value="navy">Navy</option>
+        </select>
+      </label>
+      <button class="btn" id="btnSetup">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Calling setup
+      </button>
+      <button class="btn" id="btnDownload">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+        Save this file
+      </button>
+      <span id="saveStatus" style="font-size:12px;color:var(--muted);align-self:center;white-space:nowrap">Not saved yet</span>
+      <button class="btn" id="btnClearSaved" title="Delete saved leads from this browser">Clear saved</button>
+      <button class="btn primary" id="btnImportTop">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+        Import CSV
+      </button>
+    </div>
+  </div>
+
+  <!-- hero / goal -->
+  <section class="hero">
+    <div class="htxt">
+      <h2 id="heroTitle">Tonight's calling session</h2>
+      <p>Upload your carrier list, work it one lead at a time, log the outcome in one tap, and export the day sheet when you wrap up.</p>
+    </div>
+    <div class="goalbox">
+      <div class="grow"><span>Daily goal · <b id="goalText">0 / 30 calls</b></span><button id="btnGoal">Set goal</button></div>
+      <div class="track"><div class="fill" id="goalFill"></div></div>
+    </div>
+  </section>
+
+  <!-- stats -->
+  <div class="statrow">
+    <div class="stat amber"><div class="n" id="stLeads">0</div><div class="l">Leads loaded</div></div>
+    <div class="stat blue"><div class="n" id="stCalls">0</div><div class="l">Calls logged today</div></div>
+    <div class="stat teal"><div class="n" id="stTalked">0</div><div class="l">Conversations today</div></div>
+    <div class="stat green"><div class="n" id="stInter">0</div><div class="l">Interested today</div></div>
+  </div>
+
+  <!-- tabs -->
+  <nav class="tabs" role="tablist">
+    <button class="tab on" data-view="dialer">Dialer</button>
+    <button class="tab" data-view="leads">Leads <span class="badge" id="tabLeadsCount" style="display:none">0</span></button>
+    <button class="tab" data-view="followups">Follow-ups <span class="badge red" id="tabFuCount" style="display:none">0</span></button>
+    <button class="tab" data-view="today">Today</button>
+    <button class="tab" data-view="templates">Templates</button>
+  </nav>
+
+  <!-- ============ DIALER ============ -->
+  <section class="view on" id="view-dialer">
+    <div class="empty" id="dialerEmpty">
+      <h2>No leads yet — import your list to start dialing</h2>
+      <p>Drop in any of your FMCSA carrier CSVs (the cleaned zero-mile list works great). Columns like company, contact, phone, MC, equipment and grant date are detected automatically, and duplicates are skipped.</p>
+      <button class="btn primary big" data-act="import">Import a CSV file</button>
+      <p class="small muted" style="margin-top:14px">Working in this tab only — export your day sheet before you close it to keep your notes.</p>
+    </div>
+
+    <div id="dialerMain" style="display:none">
+      <div class="dialgrid">
+        <div>
+          <div class="leadcard" id="leadCard">
+            <div class="leadinner">
+              <div class="posrow">
+                <span class="pos" id="leadPos">Lead 1 of 1</span>
+                <div class="navbtns">
+                  <button class="iconbtn" id="btnPrev" title="Previous lead (P)" aria-label="Previous lead">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                  </button>
+                  <button class="iconbtn" id="btnNextTop" title="Next lead (N)" aria-label="Next lead">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="queuebar"><i id="queueFill"></i></div>
+              <h2 class="company" id="ldCompany">—</h2>
+              <p class="contactline" id="ldContact">—</p>
+              <div class="chips" id="ldChips"></div>
+
+              <button class="copystrip" id="copyStrip" title="Copy phone number">
+                <span><span class="ph" id="ldPhone">—</span><small id="ldPhoneKind">Tap anywhere here to copy the number</small></span>
+                <span class="hint">TAP TO COPY</span>
+              </button>
+
+              <div class="actionrow">
+                <button class="abtn call" id="btnCall">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  <span id="callLabel">CALL IN RINGCENTRAL</span>
+                </button>
+                <button class="abtn" id="btnText">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  Text
+                </button>
+                <button class="abtn" id="btnWhats">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                  WhatsApp
+                </button>
+              </div>
+              <div class="actionrow2">
+                <button class="abtn" id="btnEmail">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+                  Email <small>one tap</small>
+                </button>
+                <button class="abtn" id="btnCopyEmail">Copy email</button>
+                <button class="abtn" id="btnCopyMC">Copy MC #</button>
+              </div>
+
+              <div class="brief">
+                <h3>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                  Before you call
+                </h3>
+                <div class="briefgrid" id="briefGrid"></div>
+                <p class="note" id="briefNote"></p>
+              </div>
+
+              <h3 class="secttl">Log the outcome — one tap, moves to next lead</h3>
+              <div class="outcomes">
+                <button class="obtn noans" data-outcome="No answer">No answer<small>key 1 · no pickup / voicemail</small></button>
+                <button class="obtn notint" data-outcome="Not interested">Not interested<small>key 2</small></button>
+                <button class="obtn inter" data-outcome="Interested">Interested<small>key 3 · hot lead</small></button>
+                <button class="obtn talk" data-outcome="Talked">Talked — said something<small>key 4 · add what they said</small></button>
+                <button class="obtn fup" data-outcome="Follow-up">Follow-up<small>key 5 · pick when</small></button>
+                <button class="obtn skipb" id="btnSkip">Skip<small>key S · come back later</small></button>
+              </div>
+              <div class="outcomes2">
+                <button class="obtn wrong" data-outcome="Wrong number">Wrong number</button>
+                <button class="obtn dnc" data-outcome="Do not call">Do not call</button>
+              </div>
+
+              <div class="talkpanel" id="talkPanel">
+                <h4>What did they say?</h4>
+                <div class="objchips" id="objChips"></div>
+                <div class="furow">
+                  <button class="btn primary" id="btnTalkSave">Save &amp; next lead</button>
+                  <button class="btn" id="btnTalkCancel">Cancel</button>
+                </div>
+              </div>
+
+              <div class="fupanel" id="fuPanel">
+                <h4>Follow up when?</h4>
+                <div class="fushorts">
+                  <button data-fu="tomorrow-am">Tomorrow morning</button>
+                  <button data-fu="tomorrow-pm">Tomorrow afternoon</button>
+                  <button data-fu="2days">In 2 days</button>
+                  <button data-fu="nextweek">Next week</button>
+                </div>
+                <div class="furow">
+                  <input type="datetime-local" id="fuWhen" />
+                  <button class="btn primary" id="btnFuSave">Set follow-up &amp; next</button>
+                  <button class="btn" id="btnFuCancel">Cancel</button>
+                </div>
+              </div>
+
+              <h3 class="secttl">Notes for this lead</h3>
+              <textarea class="notebox" id="noteBox" placeholder="Type a note, or tap a template below…"></textarea>
+              <div class="tplchips" id="noteTplChips"></div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="side">
+          <div class="sidecard">
+            <h3>Call opener</h3>
+            <div class="script" id="openerScript"></div>
+            <button class="btn" id="btnCopyOpener" style="width:100%;justify-content:center">Copy opener</button>
+          </div>
+          <div class="sidecard">
+            <h3>Up next</h3>
+            <div class="upnext" id="upNext"></div>
+          </div>
+          <div class="sidecard">
+            <h3>This session</h3>
+            <div id="sessionStats"></div>
+          </div>
+          <div class="sidecard">
+            <h3>Keyboard power-dialing</h3>
+            <div class="keys">
+              <kbd>C</kbd> copy number &nbsp; <kbd>Enter</kbd> call<br/>
+              <kbd>1</kbd>–<kbd>5</kbd> outcomes &nbsp; <kbd>S</kbd> skip<br/>
+              <kbd>N</kbd> next &nbsp; <kbd>P</kbd> previous
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LEADS ============ -->
+  <section class="view" id="view-leads">
+    <div class="leadtools">
+      <input type="search" id="leadSearch" placeholder="Search company, contact, city, MC…" />
+      <select id="leadFilter">
+        <option value="">All statuses</option>
+        <option value="new">Not called yet</option>
+        <option value="interested">Interested</option>
+        <option value="followup">Follow-up set</option>
+        <option value="talked">Talked</option>
+        <option value="noans">No answer</option>
+        <option value="notint">Not interested</option>
+        <option value="other">Wrong number / DNC</option>
+      </select>
+      <button class="btn" data-act="import">Import more</button>
+      <button class="btn" id="btnAddLead">+ Add lead manually</button>
+    </div>
+    <div class="grid" id="leadGrid"></div>
+    <p class="muted" id="leadGridEmpty" style="display:none">Nothing matches. Import a CSV or clear the search.</p>
+  </section>
+
+  <!-- ============ FOLLOW-UPS ============ -->
+  <section class="view" id="view-followups">
+    <div id="fuGroups"></div>
+    <div class="empty" id="fuEmpty" style="display:none">
+      <h2>No follow-ups scheduled</h2>
+      <p>When a call ends with “call me later”, tap <b>Follow-up</b> in the dialer and pick a time — it lands here, grouped by overdue, today, and coming up.</p>
+    </div>
+  </section>
+
+  <!-- ============ TODAY ============ -->
+  <section class="view" id="view-today">
+    <div class="statrow" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+      <div class="stat blue"><div class="n" id="tCalls">0</div><div class="l">Calls made</div></div>
+      <div class="stat teal"><div class="n" id="tTalked">0</div><div class="l">Talked</div></div>
+      <div class="stat green"><div class="n" id="tInter">0</div><div class="l">Interested</div></div>
+      <div class="stat amber"><div class="n" id="tFu">0</div><div class="l">Follow-ups set</div></div>
+      <div class="stat"><div class="n" id="tRate">—</div><div class="l">Contact rate</div></div>
+    </div>
+    <div class="exportrow">
+      <button class="btn primary" id="btnExpDay">Export day sheet (CSV)</button>
+      <button class="btn" id="btnExpFu">Export follow-ups (CSV)</button>
+      <button class="btn" id="btnExpAll">Export all leads (CSV)</button>
+    </div>
+    <div class="dialgrid" style="grid-template-columns:minmax(0,1fr) 320px">
+      <div>
+        <h3 class="secttl">Call log — today</h3>
+        <div id="todayLog"></div>
+        <p class="muted" id="todayLogEmpty">No calls logged yet today. Outcomes you tap in the dialer land here with time, note, and follow-up.</p>
+      </div>
+      <div class="sidecard" style="align-self:start">
+        <h3>Outcome breakdown</h3>
+        <div class="breakdown" id="breakdown"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TEMPLATES ============ -->
+  <section class="view" id="view-templates">
+    <div class="tplgrid">
+      <div>
+        <h3 class="secttl">Note templates — tap one in the dialer to drop it into the note box</h3>
+        <div id="noteTplList"></div>
+        <form class="tplform" id="noteTplForm">
+          <div class="fld"><label>Template name</label><input required id="ntName" placeholder="e.g. Left voicemail" /></div>
+          <div class="fld"><label>Text — use {name}, {company}, {city}</label><textarea required id="ntText" placeholder="Left a voicemail for {name} at {company}…"></textarea></div>
+          <button class="btn primary" type="submit">Add note template</button>
+        </form>
+      </div>
+      <div>
+        <h3 class="secttl">Email templates — used by the one-tap Email button</h3>
+        <div id="emailTplList"></div>
+        <form class="tplform" id="emailTplForm">
+          <div class="fld"><label>Template name</label><input required id="etName" placeholder="e.g. Intro — new authority" /></div>
+          <div class="fld"><label>Subject</label><input required id="etSubject" placeholder="Dispatch support for {company}" /></div>
+          <div class="fld"><label>Body — use {name}, {company}, {city}, {equipment}</label><textarea required id="etBody" style="min-height:110px"></textarea></div>
+          <button class="btn primary" type="submit">Add email template</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- calling setup modal -->
+<div class="overlay" id="setupOverlay">
+  <div class="modal">
+    <h2>Calling setup</h2>
+    <p class="sub">How the big Call button behaves. RingCentral on the web is the setup you use in Brave.</p>
+    <div class="fld">
+      <label style="display:block;font-size:12px;color:var(--muted);margin-bottom:7px;font-weight:600">CALL BUTTON OPENS</label>
+      <div class="seg" id="callModeSeg">
+        <button data-mode="rcweb" class="on">RingCentral web<small>Copies the number + opens RingCentral once in a tab — every later call reuses that same tab, no new tab each time. Paste &amp; dial</small></button>
+        <button data-mode="tel">Phone link (tel:)<small>Hands the number to whatever app your PC uses for calls</small></button>
+      </div>
+    </div>
+    <label class="check"><input type="checkbox" id="chkAutoCopy" checked /> <span>Auto-copy the number every time I hit Call</span></label>
+    <label class="check"><input type="checkbox" id="chkAutoLog" checked /> <span>Count a call in Today's log the moment I hit Call (outcome buttons still log their own result)</span></label>
+    <div class="fld" style="margin-top:14px">
+      <label style="display:block;font-size:12px;color:var(--muted);margin-bottom:7px;font-weight:600">ONE-TIME BRAVE SETUP</label>
+      <ol class="steps">
+        <li><span>Open <b>app.ringcentral.com</b> in Brave and sign in to RingCentral.</span></li>
+        <li><span><b>Pin that tab</b> so the web phone is always one click away.</span></li>
+        <li><span>Back here, hit <b>CALL IN RINGCENTRAL</b> — the first tap opens the RingCentral tab, later taps reuse that same tab. The number is copied every time.</span></li>
+        <li><span>In RingCentral, click the dialpad, press <b>Ctrl+V</b> to paste, and dial.</span></li>
+      </ol>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+      <button class="btn primary" id="btnSetupClose">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- goal modal -->
+<div class="overlay" id="goalOverlay">
+  <div class="modal" style="max-width:380px">
+    <h2>Daily call goal</h2>
+    <p class="sub">How many calls do you want to log today?</p>
+    <div class="fld"><input type="number" id="goalInput" min="1" max="500" value="30" /></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" id="btnGoalCancel">Cancel</button>
+      <button class="btn primary" id="btnGoalSave">Save goal</button>
+    </div>
+  </div>
+</div>
+
+<!-- add lead modal -->
+<div class="overlay" id="addOverlay">
+  <div class="modal">
+    <h2>Add a lead</h2>
+    <p class="sub">Only company and a phone number are required.</p>
+    <form id="addLeadForm">
+      <div class="fld"><label>Company *</label><input required id="alCompany" /></div>
+      <div class="fld"><label>Contact name</label><input id="alContact" /></div>
+      <div class="fld"><label>Phone *</label><input required id="alPhone" inputmode="tel" /></div>
+      <div class="fld"><label>Email</label><input id="alEmail" inputmode="email" /></div>
+      <div style="display:grid;grid-template-columns:1fr 90px;gap:10px">
+        <div class="fld"><label>City</label><input id="alCity" /></div>
+        <div class="fld"><label>State</label><input id="alState" maxlength="2" placeholder="TX" /></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fld"><label>MC number</label><input id="alMC" /></div>
+        <div class="fld"><label>Equipment</label><input id="alTrailer" placeholder="Dry van" /></div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn" type="button" id="btnAddCancel">Cancel</button>
+        <button class="btn primary" type="submit">Add lead</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<input type="file" id="fileInput" class="hidden-input" accept=".csv,text/csv" />
+<div id="toast" role="status"></div>
+
+<script>
+"use strict";
+/* ================= state (auto-saved to this browser; export to keep a copy) ================= */
+var S = {
+  leads: [],          // lead objects
+  log: [],            // {ts, leadId, outcome, note, followUpAt}
+  idx: 0,             // dialer pointer
+  goal: 30,
+  callMode: "rcweb",
+  autoCopy: true,
+  autoLogCall: true,
+  sessionStart: Date.now(),
+  activeEmailTpl: 0,
+  noteTpls: [
+    {name:"Left voicemail", text:"Left a voicemail for {name} at {company}. Asked them to call back about dispatch support."},
+    {name:"Gatekeeper answered", text:"Someone else picked up at {company} — owner wasn't available. Try again later."},
+    {name:"Has a dispatcher", text:"{name} says they already have a dispatcher. Not a no forever — check back in a few weeks."},
+    {name:"Runs own loads", text:"{name} books their own loads right now. Pitched backup dispatch for busy weeks."},
+    {name:"Asked for rates", text:"{name} asked about our fee %. Sent details, follow up tomorrow."},
+    {name:"Call back later", text:"{name} was busy driving / loading. Asked to call back later today."}
+  ],
+  emailTpls: [
+    {name:"Intro — new authority",
+     subject:"Dispatch support for {company} — keep your truck loaded",
+     body:"Hi {name},\n\nI work with new carriers getting their authority rolling. I help owner-operators out of {city} find steady, good-paying loads, handle the broker calls, rate confirmations, and paperwork — you just drive.\n\nIf dispatching yourself is eating your time, I'd be glad to walk you through how it works. No long contract.\n\nReply to this email or call me back and we'll talk.\n\nThanks,\nDispatch Team"},
+    {name:"Follow-up — no answer",
+     subject:"Tried reaching you — dispatch help for {company}",
+     body:"Hi {name},\n\nI tried calling earlier about dispatch support for {company}. We help carriers with {equipment} keep consistent loads without spending the day on load boards and broker calls.\n\nWorth a 5-minute chat? Just reply here.\n\nThanks,\nDispatch Team"}
+  ],
+  objections: ["Already has a dispatcher","Fee too high","Books own loads","Wants loads first","Busy driving","Skeptical / asked for proof","Wants to think about it","Runs local only"]
+};
+var $ = function(id){ return document.getElementById(id); };
+
+/* ================= auto-save (GitHub Pages / https version) ================= */
+/* On a live https page (GitHub Pages) localStorage persists per browser/device, */
+/* so closing Brave and reopening the same link restores your leads. */
+/* On a local file:// page this is unreliable, which is why GitHub is better. */
+var SAVE_KEY = "leadcrm-progress-v1";
+var restoredCount = 0;
+function saveProgress(){
+  try{
+    localStorage.setItem(SAVE_KEY, JSON.stringify({
+      leads: S.leads, log: S.log, idx: S.idx, goal: S.goal,
+      callMode: S.callMode, autoCopy: S.autoCopy, autoLogCall: S.autoLogCall,
+      noteTpls: S.noteTpls, emailTpls: S.emailTpls, activeEmailTpl: S.activeEmailTpl,
+      theme: document.documentElement.getAttribute("data-theme")
+    }));
+    var el = $("saveStatus");
+    if(el) el.textContent = "Saved \u2713 " + new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+  }catch(e){}
+}
+function loadProgress(){
+  try{
+    var raw = localStorage.getItem(SAVE_KEY);
+    if(!raw) return;
+    var d = JSON.parse(raw);
+    if(d && Array.isArray(d.leads) && d.leads.length){
+      S.leads = d.leads; S.log = d.log || []; S.idx = d.idx || 0; S.goal = d.goal || 30;
+      if(d.callMode) S.callMode = d.callMode;
+      if(typeof d.autoCopy === "boolean") S.autoCopy = d.autoCopy;
+      if(typeof d.autoLogCall === "boolean") S.autoLogCall = d.autoLogCall;
+      if(Array.isArray(d.noteTpls) && d.noteTpls.length) S.noteTpls = d.noteTpls;
+      if(Array.isArray(d.emailTpls) && d.emailTpls.length) S.emailTpls = d.emailTpls;
+      if(typeof d.activeEmailTpl === "number") S.activeEmailTpl = d.activeEmailTpl;
+      restoredCount = d.leads.length;
+    }
+  }catch(e){}
+}
+
+/* ================= state -> timezone ================= */
+var STATE_TZ = {AL:"America/Chicago",AK:"America/Anchorage",AZ:"America/Phoenix",AR:"America/Chicago",CA:"America/Los_Angeles",CO:"America/Denver",CT:"America/New_York",DE:"America/New_York",FL:"America/New_York",GA:"America/New_York",HI:"Pacific/Honolulu",ID:"America/Boise",IL:"America/Chicago",IN:"America/Indiana/Indianapolis",IA:"America/Chicago",KS:"America/Chicago",KY:"America/New_York",LA:"America/Chicago",ME:"America/New_York",MD:"America/New_York",MA:"America/New_York",MI:"America/Detroit",MN:"America/Chicago",MS:"America/Chicago",MO:"America/Chicago",MT:"America/Denver",NE:"America/Chicago",NV:"America/Los_Angeles",NH:"America/New_York",NJ:"America/New_York",NM:"America/Denver",NY:"America/New_York",NC:"America/New_York",ND:"America/Chicago",OH:"America/New_York",OK:"America/Chicago",OR:"America/Los_Angeles",PA:"America/New_York",RI:"America/New_York",SC:"America/New_York",SD:"America/Chicago",TN:"America/Chicago",TX:"America/Chicago",UT:"America/Denver",VT:"America/New_York",VA:"America/New_York",WA:"America/Los_Angeles",WV:"America/New_York",WI:"America/Chicago",WY:"America/Denver",DC:"America/New_York"};
+
+/* ================= utils ================= */
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+function digits(s){ return String(s||"").replace(/\D/g,""); }
+function fmtPhone(s){
+  var d = digits(s);
+  if(d.length===11 && d.charAt(0)==="1") d = d.slice(1);
+  if(d.length===10) return "("+d.slice(0,3)+") "+d.slice(3,6)+"-"+d.slice(6);
+  return s || "";
+}
+function intlPhone(s){
+  var d = digits(s);
+  if(d.length===10) return "1"+d;
+  return d;
+}
+var toastTimer = null;
+function toast(html){
+  var t = $("toast"); t.innerHTML = html; t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 2600);
+}
+function copyText(text, label){
+  function done(){ toast("<b>Copied</b> — " + esc(label||text)); }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(function(){ fallback(); });
+  } else fallback();
+  function fallback(){
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); done(); }catch(e){ toast("Copy failed — long-press to copy manually"); }
+    document.body.removeChild(ta);
+  }
+}
+function fillTpl(text, lead){
+  if(!lead) return text;
+  return text.replace(/\{name\}/gi, lead.contact || "there")
+             .replace(/\{company\}/gi, lead.company || "")
+             .replace(/\{city\}/gi, lead.city || "")
+             .replace(/\{equipment\}/gi, lead.trailer || "your equipment");
+}
+function leadLocal(lead){
+  var tz = STATE_TZ[(lead.state||"").toUpperCase()];
+  if(!tz) return null;
+  try{
+    var now = new Date();
+    var parts = new Intl.DateTimeFormat("en-US",{timeZone:tz,hour:"numeric",minute:"2-digit",hour12:true}).format(now);
+    var hour = parseInt(new Intl.DateTimeFormat("en-US",{timeZone:tz,hour:"numeric",hour12:false}).format(now),10);
+    return {label: parts, hour: hour, tz: tz};
+  }catch(e){ return null; }
+}
+function mcAge(lead){
+  if(!lead.grantDate) return null;
+  var d = new Date(lead.grantDate);
+  if(isNaN(d.getTime())) return null;
+  var days = Math.floor((Date.now() - d.getTime())/86400000);
+  return days;
+}
+function todayStr(d){
+  d = d || new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function isToday(ts){ return todayStr(new Date(ts)) === todayStr(); }
+function fmtTime(ts){
+  return new Date(ts).toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+}
+function fmtFu(ts){
+  var d = new Date(ts), now = new Date();
+  var day = d.toLocaleDateString([], {weekday:"short", month:"short", day:"numeric"});
+  if(todayStr(d)===todayStr(now)) day = "Today";
+  var tmr = new Date(now); tmr.setDate(tmr.getDate()+1);
+  if(todayStr(d)===todayStr(tmr)) day = "Tomorrow";
+  return day + " · " + fmtTime(ts);
+}
+function handOff(url){
+  var a = document.createElement("a");
+  a.href = url; a.style.display = "none";
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ a.remove(); }, 300);
+}
+function download(filename, text, mime){
+  var blob = new Blob([text], {type: mime || "text/csv;charset=utf-8"});
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 400);
+}
+function csvCell(v){
+  v = v==null ? "" : String(v);
+  return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v;
+}
+function toCSV(headers, rows){
+  var lines = [headers.map(csvCell).join(",")];
+  rows.forEach(function(r){ lines.push(r.map(csvCell).join(",")); });
+  return lines.join("\r\n");
+}
+
+/* ================= CSV import ================= */
+function parseCSV(text){
+  var rows = [], row = [], cell = "", inQ = false, i, c;
+  text = text.replace(/^\uFEFF/, "");
+  for(i=0;i<text.length;i++){
+    c = text.charAt(i);
+    if(inQ){
+      if(c==='"'){ if(text.charAt(i+1)==='"'){ cell+='"'; i++; } else inQ=false; }
+      else cell += c;
+    } else {
+      if(c==='"') inQ = true;
+      else if(c===","){ row.push(cell); cell=""; }
+      else if(c==="\n"){ row.push(cell); rows.push(row); row=[]; cell=""; }
+      else if(c==="\r"){ /* skip */ }
+      else cell += c;
+    }
+  }
+  if(cell.length || row.length){ row.push(cell); rows.push(row); }
+  return rows.filter(function(r){ return r.length>1 || (r.length===1 && r[0].trim()!==""); });
+}
+var COLMAP = [
+  ["company", ["company","legal name","legalname","business name","carrier name","name of carrier","dba"]],
+  ["contact", ["contact","contact name","owner","owner name","owner officer","person","first name","rep","representative"]],
+  ["phone",   ["phone","telephone","tel","main phone","business phone"]],
+  ["cell",    ["cell","mobile","cell phone","mobile phone"]],
+  ["email",   ["email","e-mail","email address"]],
+  ["city",    ["city","phy city","physical city"]],
+  ["state",   ["state","st","phy state","physical state"]],
+  ["mc",      ["mc docket","mc","mc number","mc_number","mc #","mcnumber"]],
+  ["usdot",   ["usdot","dot","dot number","usdot number","dot_number"]],
+  ["grantDate",["grant date","granted date","authority grant","mc grant","mc granted","granted","grant","authority date","add date","date added"]],
+  ["trailer", ["likely trailer type","trailer","equipment","trailer type","equipment type","vehicle type"]],
+  ["operation",["operation","op type","operation type"," otr","scope","local otr","radius"]],
+  ["trucks",  ["trucks","power units","units","truck count","powerunits"]],
+  ["drivers", ["drivers","driver count","drivers total"]],
+  ["miles",   ["miles","mileage","reported miles","total miles"]],
+  ["cargo",   ["cargo types","cargo","cargo carried","commodity","commodities"]]
+];
+function mapHeaders(headers){
+  var lower = headers.map(function(h){ return String(h||"").toLowerCase().trim().replace(/_/g," ").replace(/\s+/g," "); });
+  var map = {};
+  function useExact(){
+    COLMAP.forEach(function(pair){
+      var field = pair[0], keys = pair[1];
+      for(var i=0;i<lower.length;i++){
+        if(map._used && map._used[i]) continue;
+        if(keys.indexOf(lower[i]) !== -1){ map[field] = i; (map._used = map._used || {})[i] = true; break; }
+      }
+    });
+  }
+  function usePartial(){
+    COLMAP.forEach(function(pair){
+      var field = pair[0], keys = pair[1];
+      if(map[field] != null) return;
+      for(var i=0;i<lower.length;i++){
+        if(map._used && map._used[i]) continue;
+        var h = lower[i];
+        for(var k=0;k<keys.length;k++){
+          if(h.indexOf(keys[k]) !== -1){ map[field] = i; (map._used = map._used || {})[i] = true; break; }
+        }
+        if(map[field] != null) break;
+      }
+    });
+  }
+  useExact(); usePartial();
+  return map;
+}
+function importCSVText(text){
+  var rows = parseCSV(text);
+  if(rows.length < 2){ toast("That file looks empty — no data rows found."); return; }
+  var map = mapHeaders(rows[0]);
+  if(map.company == null && map.phone == null && map.cell == null){
+    toast("Couldn't find company / phone columns in that CSV."); return;
+  }
+  var seen = {};
+  S.leads.forEach(function(l){ seen[(digits(l.cell||l.phone) || (l.mc||"")+"|"+l.company.toLowerCase())] = true; });
+  var added = 0, dup = 0;
+  for(var r=1;r<rows.length;r++){
+    var row = rows[r];
+    function g(f){ return map[f]!=null ? String(row[map[f]]||"").trim() : ""; }
+    var phone = g("phone"), cell = g("cell");
+    var lead = {
+      id: "L" + Date.now().toString(36) + r,
+      company: g("company") || "(no company name)",
+      contact: g("contact"),
+      phone: phone, cell: cell,
+      email: g("email"),
+      city: g("city"), state: g("state").toUpperCase().slice(0,2),
+      mc: g("mc").replace(/^MC[-\s]*/i,""),
+      usdot: g("usdot"),
+      grantDate: g("grantDate"),
+      trailer: g("trailer"),
+      operation: g("operation"),
+      trucks: g("trucks"), drivers: g("drivers"),
+      miles: g("miles"), cargo: g("cargo"),
+      status: "new", notes: "", followUpAt: null, attempts: 0, lastOutcome: ""
+    };
+    if(!lead.phone && !lead.cell){ dup++; continue; }
+    var key = digits(lead.cell||lead.phone) || (lead.mc+"|"+lead.company.toLowerCase());
+    if(seen[key]){ dup++; continue; }
+    seen[key] = true;
+    S.leads.push(lead); added++;
+  }
+  if(added === 0){ toast("No new leads added — " + dup + " duplicates or phoneless rows skipped."); return; }
+  toast("<b>" + added + " leads imported</b>" + (dup ? " · " + dup + " skipped (dup / no phone)" : ""));
+  S.idx = firstOpenIndex();
+  renderAll();
+  switchView("dialer");
+}
+function firstOpenIndex(){
+  for(var i=0;i<S.leads.length;i++){ if(S.leads[i].status==="new") return i; }
+  return 0;
+}
+
+/* ================= derived stats ================= */
+function todayLog(){ return S.log.filter(function(e){ return isToday(e.ts); }); }
+function countOutcome(list, name){ return list.filter(function(e){ return e.outcome===name; }).length; }
+
+/* ================= current lead ================= */
+function cur(){ return S.leads[S.idx] || null; }
+
+function renderDialer(dir){
+  var has = S.leads.length > 0;
+  $("dialerEmpty").style.display = has ? "none" : "block";
+  $("dialerMain").style.display = has ? "block" : "none";
+  if(!has) return;
+  if(S.idx >= S.leads.length) S.idx = S.leads.length - 1;
+  if(S.idx < 0) S.idx = 0;
+  var lead = cur();
+  var card = $("leadCard");
+  card.classList.remove("back");
+  if(dir === "back") card.classList.add("back");
+  card.style.animation = "none"; void card.offsetWidth; card.style.animation = "";
+
+  $("leadPos").textContent = "Lead " + (S.idx+1) + " of " + S.leads.length;
+  var doneCount = S.leads.filter(function(l){ return l.status!=="new"; }).length;
+  $("queueFill").style.width = (S.leads.length ? (doneCount/S.leads.length*100) : 0) + "%";
+  $("ldCompany").textContent = lead.company;
+  var loc = [lead.city, lead.state].filter(Boolean).join(", ");
+  $("ldContact").innerHTML = (lead.contact ? "<b>" + esc(lead.contact) + "</b>" : "Owner / contact not listed")
+    + (loc ? " · " + esc(loc) : "")
+    + (lead.status!=="new" ? " · last: " + esc(lead.lastOutcome || lead.status) : "");
+
+  /* chips */
+  var chips = [];
+  var age = mcAge(lead);
+  if(age != null && age <= 45) chips.push('<span class="chip hot">Fresh authority · ' + age + 'd old</span>');
+  else if(age != null) chips.push('<span class="chip">MC age ' + age + 'd</span>');
+  if(lead.trailer && /dry van/i.test(lead.trailer) && (!lead.trucks || parseInt(lead.trucks,10) <= 2)) chips.push('<span class="chip hot">Strong fit · solo dry van</span>');
+  var local = leadLocal(lead);
+  if(local){
+    if(local.hour >= 9 && local.hour < 17) chips.push('<span class="chip win">In calling window · ' + esc(local.label) + ' local</span>');
+    else if(local.hour < 9) chips.push('<span class="chip info">Window opens 9 AM · now ' + esc(local.label) + ' local</span>');
+    else chips.push('<span class="chip closed">Window closed · ' + esc(local.label) + ' local</span>');
+  }
+  if(lead.attempts > 0) chips.push('<span class="chip">' + lead.attempts + ' attempt' + (lead.attempts>1?"s":"") + '</span>');
+  if(lead.followUpAt) chips.push('<span class="chip hot">Follow-up: ' + esc(fmtFu(lead.followUpAt)) + '</span>');
+  $("ldChips").innerHTML = chips.join("");
+
+  var num = lead.cell || lead.phone;
+  $("ldPhone").textContent = fmtPhone(num) || "No number";
+  $("ldPhoneKind").textContent = lead.cell ? "Cell number — tap to copy" : "Phone number — tap to copy";
+  $("btnCall").disabled = !num;
+  $("btnText").disabled = !num;
+  $("btnWhats").disabled = !num;
+  $("btnEmail").disabled = !lead.email;
+  $("btnCopyEmail").disabled = !lead.email;
+  $("btnCopyMC").disabled = !lead.mc;
+  $("callLabel").textContent = S.callMode === "rcweb" ? "CALL IN RINGCENTRAL" : "CALL NOW";
+
+  renderBrief(lead);
+  $("noteBox").value = lead.notes || "";
+  closePanels();
+
+  /* opener */
+  var first = (lead.contact || "").split(" ")[0];
+  $("openerScript").innerHTML = "“Hi" + (first ? " <b>" + esc(first) + "</b>" : "") +
+    ", this is dispatch calling for <b>" + esc(lead.company) + "</b>. I saw your authority is " +
+    (age != null ? "about <b>" + age + " days</b> old" : "new") +
+    " — are you booking your own loads right now, or do you have someone running dispatch for you?”";
+
+  /* up next */
+  var up = [];
+  for(var i=1;i<=5 && i<S.leads.length;i++){
+    var j = (S.idx+i) % S.leads.length;
+    if(j === S.idx) break;
+    up.push({i:j, l:S.leads[j]});
+  }
+  $("upNext").innerHTML = up.length ? up.map(function(u){
+    return '<button class="upitem" data-jump="' + u.i + '"><span><span class="nm">' + esc(u.l.company) + '</span><br/><span class="mt">' +
+      esc(fmtPhone(u.l.cell||u.l.phone)) + (u.l.state ? " · " + esc(u.l.state) : "") + '</span></span><span class="go">DIAL →</span></button>';
+  }).join("") : '<p class="muted small" style="margin:0">No more leads in the list.</p>';
+  Array.prototype.forEach.call(document.querySelectorAll("[data-jump]"), function(b){
+    b.addEventListener("click", function(){ S.idx = parseInt(b.getAttribute("data-jump"),10); renderDialer(); });
+  });
+
+  renderSession();
+}
+function briefItem(k, v, copyVal){
+  return '<div class="it"><div class="k">' + esc(k) + '</div><div class="v">' + esc(v || "—") +
+    (copyVal ? ' <button class="mini-copy" data-copy="' + esc(copyVal) + '" title="Copy ' + esc(k) + '"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>' : "") +
+    '</div></div>';
+}
+function renderBrief(lead){
+  var age = mcAge(lead);
+  var items = [];
+  items.push(briefItem("Equipment", lead.trailer));
+  items.push(briefItem("Operation", lead.operation));
+  items.push(briefItem("Trucks / Drivers", [lead.trucks, lead.drivers].filter(Boolean).join(" trucks · ") ? (lead.trucks||"?") + " trucks · " + (lead.drivers||"?") + " drivers" : ""));
+  items.push(briefItem("MC number", lead.mc ? "MC " + lead.mc : "", lead.mc));
+  items.push(briefItem("USDOT", lead.usdot, lead.usdot));
+  items.push(briefItem("MC granted", lead.grantDate ? lead.grantDate + (age!=null ? " (" + age + "d ago)" : "") : ""));
+  items.push(briefItem("Reported miles", lead.miles));
+  items.push(briefItem("Email", lead.email, lead.email));
+  $("briefGrid").innerHTML = items.join("");
+  Array.prototype.forEach.call($("briefGrid").querySelectorAll("[data-copy]"), function(b){
+    b.addEventListener("click", function(){ copyText(b.getAttribute("data-copy"), b.getAttribute("data-copy")); });
+  });
+  var bits = [];
+  if(age != null && age <= 30) bits.push("<b>Brand-new authority</b> — likely still setting up dispatch, prime time to pitch.");
+  if(lead.miles && digits(lead.miles) === "0") bits.push("<b>Zero reported miles</b> — hasn't really started running yet.");
+  if(lead.trailer) bits.push("Runs <b>" + esc(lead.trailer) + "</b>" + (lead.operation ? " · " + esc(lead.operation) : "") + ".");
+  if(lead.cargo) bits.push("Cargo: " + esc(lead.cargo) + ".");
+  if(!bits.length) bits.push("Standard new-carrier lead — confirm equipment and whether they have dispatch help yet.");
+  $("briefNote").innerHTML = bits.join(" ");
+}
+function renderSession(){
+  var t = todayLog();
+  var rows = [
+    ["Calls logged today", t.length],
+    ["Talked", countOutcome(t,"Talked") + countOutcome(t,"Interested")],
+    ["Interested", countOutcome(t,"Interested")],
+    ["Follow-ups set", countOutcome(t,"Follow-up")],
+    ["Session time", Math.max(1, Math.round((Date.now()-S.sessionStart)/60000)) + " min"]
+  ];
+  $("sessionStats").innerHTML = rows.map(function(r){
+    return '<div class="sessrow"><span class="muted">' + r[0] + '</span><b>' + r[1] + '</b></div>';
+  }).join("");
+}
+
+/* ================= header stats / goal / tabs ================= */
+function renderHeader(){
+  var t = todayLog();
+  var calls = t.length;
+  $("stLeads").textContent = S.leads.length;
+  $("stCalls").textContent = calls;
+  $("stTalked").textContent = countOutcome(t,"Talked") + countOutcome(t,"Interested");
+  $("stInter").textContent = countOutcome(t,"Interested");
+  $("goalText").textContent = calls + " / " + S.goal + " calls";
+  $("goalFill").style.width = Math.min(100, S.goal ? calls/S.goal*100 : 0) + "%";
+  $("heroTitle").textContent = calls >= S.goal && S.goal > 0 ? "Goal smashed — strong session." :
+    (calls > 0 ? "Calling session in progress" : "Tonight's calling session");
+  var lc = $("tabLeadsCount");
+  lc.style.display = S.leads.length ? "inline-block" : "none";
+  lc.textContent = S.leads.length;
+  var due = S.leads.filter(function(l){ return l.followUpAt && l.followUpAt <= Date.now(); }).length;
+  var fc = $("tabFuCount");
+  fc.style.display = due ? "inline-block" : "none";
+  fc.textContent = due;
+}
+
+/* ================= leads grid ================= */
+function statusKey(lead){
+  switch(lead.status){
+    case "interested": return "interested";
+    case "followup": return "followup";
+    case "talked": return "talked";
+    case "noans": return "noans";
+    case "notint": return "notint";
+    case "wrong": case "dnc": return "other";
+    default: return "new";
+  }
+}
+function statusLabel(lead){
+  return {new:"Not called",interested:"Interested",followup:"Follow-up",talked:"Talked",noans:"No answer",notint:"Not interested",wrong:"Wrong number",dnc:"Do not call"}[lead.status] || lead.status;
+}
+function renderLeads(){
+  var q = ($("leadSearch").value || "").toLowerCase();
+  var f = $("leadFilter").value;
+  var list = S.leads.map(function(l, i){ return {l:l, i:i}; }).filter(function(x){
+    if(f && statusKey(x.l) !== f) return false;
+    if(!q) return true;
+    return (x.l.company + " " + x.l.contact + " " + x.l.city + " " + x.l.state + " " + x.l.mc).toLowerCase().indexOf(q) !== -1;
+  });
+  $("leadGridEmpty").style.display = list.length ? "none" : "block";
+  $("leadGrid").innerHTML = list.slice(0, 300).map(function(x){
+    var l = x.l, num = l.cell || l.phone;
+    return '<div class="lcard"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">' +
+      '<h4>' + esc(l.company) + '</h4><span class="statuspill st-' + statusKey(l) + '">' + esc(statusLabel(l)) + '</span></div>' +
+      '<div class="sub">' + esc(l.contact || "Owner") + (l.city ? " · " + esc(l.city) + ", " + esc(l.state) : "") + '</div>' +
+      '<div class="meta"><span>' + esc(fmtPhone(num)) + '</span>' + (l.mc ? '<span>MC ' + esc(l.mc) + '</span>' : '') + (l.trailer ? '<span>' + esc(l.trailer) + '</span>' : '') + '</div>' +
+      '<div class="rowbtns">' +
+      '<button class="smbtn" data-dial="' + x.i + '">Open in dialer</button>' +
+      '<button class="smbtn" data-cp="' + esc(num) + '">Copy number</button>' +
+      (l.email ? '<button class="smbtn" data-cpe="' + esc(l.email) + '">Copy email</button>' : '') +
+      '<button class="smbtn danger" data-del="' + x.i + '">Remove</button></div></div>';
+  }).join("");
+  Array.prototype.forEach.call($("leadGrid").querySelectorAll("[data-dial]"), function(b){
+    b.addEventListener("click", function(){ S.idx = parseInt(b.getAttribute("data-dial"),10); switchView("dialer"); renderDialer(); });
+  });
+  Array.prototype.forEach.call($("leadGrid").querySelectorAll("[data-cp]"), function(b){
+    b.addEventListener("click", function(){ copyText(b.getAttribute("data-cp"), fmtPhone(b.getAttribute("data-cp"))); });
+  });
+  Array.prototype.forEach.call($("leadGrid").querySelectorAll("[data-cpe]"), function(b){
+    b.addEventListener("click", function(){ copyText(b.getAttribute("data-cpe"), "email"); });
+  });
+  Array.prototype.forEach.call($("leadGrid").querySelectorAll("[data-del]"), function(b){
+    b.addEventListener("click", function(){
+      var i = parseInt(b.getAttribute("data-del"),10);
+      var gone = S.leads.splice(i,1)[0];
+      if(S.idx >= S.leads.length) S.idx = Math.max(0, S.leads.length-1);
+      toast("Removed <b>" + esc(gone.company) + "</b>");
+      renderAll();
+    });
+  });
+}
+
+/* ================= follow-ups ================= */
+function renderFollowups(){
+  var fus = S.leads.filter(function(l){ return l.followUpAt; })
+    .sort(function(a,b){ return a.followUpAt - b.followUpAt; });
+  $("fuEmpty").style.display = fus.length ? "none" : "block";
+  var now = Date.now();
+  var endToday = new Date(); endToday.setHours(23,59,59,999);
+  var groups = [
+    {key:"overdue", title:"Overdue", cls:"overdue", list: fus.filter(function(l){ return l.followUpAt < now; })},
+    {key:"today", title:"Due today", cls:"", list: fus.filter(function(l){ return l.followUpAt >= now && l.followUpAt <= endToday.getTime(); })},
+    {key:"later", title:"Coming up", cls:"", list: fus.filter(function(l){ return l.followUpAt > endToday.getTime(); })}
+  ];
+  $("fuGroups").innerHTML = groups.filter(function(g){ return g.list.length; }).map(function(g){
+    return '<div class="fugroup"><h3>' + g.title + ' <span class="cnt">' + g.list.length + '</span></h3>' +
+      g.list.map(function(l){
+        var gi = S.leads.indexOf(l);
+        return '<div class="fuitem ' + g.cls + '"><div class="who"><b>' + esc(l.company) + '</b><div>' +
+          esc(l.contact || "") + (l.city ? " · " + esc(l.city) + ", " + esc(l.state) : "") +
+          (l.notes ? "<br/>" + esc(l.notes) : "") + '</div></div>' +
+          '<span class="when">' + esc(fmtFu(l.followUpAt)) + '</span>' +
+          '<button class="smbtn" data-fucp="' + esc(l.cell||l.phone) + '">Copy number</button>' +
+          '<button class="smbtn" data-fudial="' + gi + '">Call now</button>' +
+          '<button class="smbtn" data-fudone="' + gi + '">Done</button></div>';
+      }).join("") + '</div>';
+  }).join("");
+  Array.prototype.forEach.call($("fuGroups").querySelectorAll("[data-fucp]"), function(b){
+    b.addEventListener("click", function(){ copyText(b.getAttribute("data-fucp"), fmtPhone(b.getAttribute("data-fucp"))); });
+  });
+  Array.prototype.forEach.call($("fuGroups").querySelectorAll("[data-fudial]"), function(b){
+    b.addEventListener("click", function(){ S.idx = parseInt(b.getAttribute("data-fudial"),10); switchView("dialer"); renderDialer(); });
+  });
+  Array.prototype.forEach.call($("fuGroups").querySelectorAll("[data-fudone]"), function(b){
+    b.addEventListener("click", function(){
+      var l = S.leads[parseInt(b.getAttribute("data-fudone"),10)];
+      l.followUpAt = null; if(l.status === "followup") l.status = "talked";
+      toast("Follow-up cleared for <b>" + esc(l.company) + "</b>");
+      renderAll();
+    });
+  });
+}
+
+/* ================= today ================= */
+function renderToday(){
+  var t = todayLog().slice().sort(function(a,b){ return b.ts - a.ts; });
+  $("tCalls").textContent = t.length;
+  var talked = countOutcome(t,"Talked") + countOutcome(t,"Interested");
+  $("tTalked").textContent = talked;
+  $("tInter").textContent = countOutcome(t,"Interested");
+  $("tFu").textContent = countOutcome(t,"Follow-up");
+  $("tRate").textContent = t.length ? Math.round(talked/t.length*100) + "%" : "—";
+  $("todayLogEmpty").style.display = t.length ? "none" : "block";
+  $("todayLog").innerHTML = t.map(function(e){
+    var l = S.leads.filter(function(x){ return x.id === e.leadId; })[0];
+    return '<div class="logitem"><span class="t">' + fmtTime(e.ts) + '</span>' +
+      '<span class="c">' + esc(e.company) + '</span>' +
+      '<span class="statuspill st-' + (l ? statusKey(l) : "other") + '">' + esc(e.outcome) + '</span>' +
+      (e.followUpAt ? '<span class="when" style="font-family:var(--mono);font-size:12.5px;color:var(--amber)">FU ' + esc(fmtFu(e.followUpAt)) + '</span>' : '') +
+      (l ? '<button class="smbtn" data-logcp="' + esc(l.cell||l.phone) + '">Copy number</button>' : '') +
+      (e.note ? '<span class="nt">' + esc(e.note) + '</span>' : '') + '</div>';
+  }).join("");
+  Array.prototype.forEach.call($("todayLog").querySelectorAll("[data-logcp]"), function(b){
+    b.addEventListener("click", function(){ copyText(b.getAttribute("data-logcp"), fmtPhone(b.getAttribute("data-logcp"))); });
+  });
+  var names = ["Interested","Talked","Follow-up","No answer","Not interested","Wrong number","Do not call","Called"];
+  var colors = {"Interested":"var(--green)","Talked":"var(--teal)","Follow-up":"var(--amber)","No answer":"var(--blue)","Not interested":"var(--red)","Wrong number":"var(--dim)","Do not call":"var(--red)","Called":"var(--muted)"};
+  var max = Math.max(1, t.length);
+  $("breakdown").innerHTML = names.map(function(n){
+    var c = countOutcome(t, n);
+    if(!c) return "";
+    return '<div class="bdrow"><span>' + n + '</span><span class="bar"><i style="width:' + (c/max*100) + '%;background:' + colors[n] + '"></i></span><span class="n">' + c + '</span></div>';
+  }).join("") || '<p class="muted small" style="margin:0">No calls yet today.</p>';
+}
+
+/* ================= templates ================= */
+function renderTemplates(){
+  $("noteTplList").innerHTML = S.noteTpls.map(function(t, i){
+    return '<div class="tplcard"><h4>' + esc(t.name) + '</h4><p>' + esc(t.text) + '</p>' +
+      '<button class="smbtn danger" data-delnote="' + i + '">Delete</button></div>';
+  }).join("") || '<p class="muted">No note templates yet.</p>';
+  $("emailTplList").innerHTML = S.emailTpls.map(function(t, i){
+    return '<div class="tplcard"><h4>' + esc(t.name) + (i === S.activeEmailTpl ? ' <span class="statuspill st-followup">used by Email button</span>' : '') + '</h4>' +
+      '<p><b style="color:var(--txt)">Subject:</b> ' + esc(t.subject) + '\n' + esc(t.body) + '</p>' +
+      (i !== S.activeEmailTpl ? '<button class="smbtn" data-useemail="' + i + '">Use for Email button</button> ' : '') +
+      '<button class="smbtn danger" data-delemail="' + i + '">Delete</button></div>';
+  }).join("") || '<p class="muted">No email templates yet.</p>';
+  $("noteTplChips").innerHTML = S.noteTpls.map(function(t, i){
+    return '<button data-tpl="' + i + '">' + esc(t.name) + '</button>';
+  }).join("");
+  Array.prototype.forEach.call($("noteTplChips").querySelectorAll("[data-tpl]"), function(b){
+    b.addEventListener("click", function(){
+      var lead = cur(); if(!lead) return;
+      var txt = fillTpl(S.noteTpls[parseInt(b.getAttribute("data-tpl"),10)].text, lead);
+      var box = $("noteBox");
+      box.value = (box.value ? box.value.replace(/\s+$/,"") + " " : "") + txt;
+      lead.notes = box.value;
+      box.focus();
+    });
+  });
+  Array.prototype.forEach.call($("noteTplList").querySelectorAll("[data-delnote]"), function(b){
+    b.addEventListener("click", function(){ S.noteTpls.splice(parseInt(b.getAttribute("data-delnote"),10),1); renderTemplates(); });
+  });
+  Array.prototype.forEach.call($("emailTplList").querySelectorAll("[data-delemail]"), function(b){
+    b.addEventListener("click", function(){
+      S.emailTpls.splice(parseInt(b.getAttribute("data-delemail"),10),1);
+      if(S.activeEmailTpl >= S.emailTpls.length) S.activeEmailTpl = 0;
+      renderTemplates();
+    });
+  });
+  Array.prototype.forEach.call($("emailTplList").querySelectorAll("[data-useemail]"), function(b){
+    b.addEventListener("click", function(){ S.activeEmailTpl = parseInt(b.getAttribute("data-useemail"),10); renderTemplates(); toast("Email button will use this template"); });
+  });
+  /* objection chips */
+  $("objChips").innerHTML = S.objections.map(function(o){
+    return '<button data-obj="' + esc(o) + '">' + esc(o) + '</button>';
+  }).join("");
+  Array.prototype.forEach.call($("objChips").querySelectorAll("[data-obj]"), function(b){
+    b.addEventListener("click", function(){
+      var lead = cur(); if(!lead) return;
+      var box = $("noteBox");
+      var txt = "They said: " + b.getAttribute("data-obj") + ".";
+      box.value = (box.value ? box.value.replace(/\s+$/,"") + " " : "") + txt;
+      lead.notes = box.value;
+    });
+  });
+}
+
+function renderAll(){
+  renderHeader(); renderDialer(); renderLeads(); renderFollowups(); renderToday(); renderTemplates();
+  saveProgress();
+}
+
+/* ================= actions ================= */
+function saveNoteFromBox(){
+  var lead = cur(); if(!lead) return;
+  lead.notes = $("noteBox").value;
+}
+function advance(dir){
+  if(!S.leads.length) return;
+  S.idx = (S.idx + (dir || 1) + S.leads.length) % S.leads.length;
+  renderDialer(dir < 0 ? "back" : "fwd");
+  renderHeader();
+}
+function logOutcome(outcome, followUpAt){
+  var lead = cur(); if(!lead) return;
+  saveNoteFromBox();
+  lead.attempts++;
+  lead.lastOutcome = outcome;
+  lead.status = {"No answer":"noans","Not interested":"notint","Interested":"interested","Talked":"talked","Follow-up":"followup","Wrong number":"wrong","Do not call":"dnc","Called":"talked"}[outcome] || lead.status;
+  if(outcome === "Follow-up" && followUpAt) lead.followUpAt = followUpAt;
+  if(outcome === "Do not call" || outcome === "Wrong number") lead.followUpAt = null;
+  S.log.push({ts: Date.now(), leadId: lead.id, company: lead.company, outcome: outcome, note: lead.notes || "", followUpAt: followUpAt || null});
+  toast("<b>" + esc(outcome) + "</b> logged for " + esc(lead.company));
+  renderAll();
+  advance(1);
+}
+var rcWin = null;
+function openRingCentralTab(num){
+  var url = "https://app.ringcentral.com/phone/call?number=%2B" + intlPhone(num);
+  if(rcWin && !rcWin.closed){
+    try{ rcWin.location.href = url; }catch(e){ rcWin = window.open(url, "ringcentral-crm"); }
+    try{ rcWin.focus(); }catch(e){}
+    return "reused";
+  }
+  rcWin = window.open(url, "ringcentral-crm");
+  return rcWin ? "opened" : "blocked";
+}
+function doCall(){
+  var lead = cur(); if(!lead) return;
+  var num = lead.cell || lead.phone;
+  if(!num){ toast("No number on this lead."); return; }
+  if(S.autoCopy) copyText(num, fmtPhone(num));
+  if(S.callMode === "rcweb"){
+    var how = openRingCentralTab(num);
+    if(how === "reused") toast("<b>RingCentral tab reused</b> — same tab, number copied, paste it in the dialpad (Ctrl+V)");
+    else if(how === "opened") toast("<b>RingCentral opened in a new tab</b> — keep that tab open, next calls will reuse it. Number copied, paste it in the dialpad (Ctrl+V)");
+    else toast("Popup blocked — allow popups for this file, then tap Call again. Number is copied.");
+  } else {
+    handOff("tel:+" + intlPhone(num));
+  }
+  if(S.autoLogCall){
+    lead.attempts++;
+    S.log.push({ts: Date.now(), leadId: lead.id, company: lead.company, outcome: "Called", note: "", followUpAt: null});
+    renderHeader(); renderToday(); renderSession();
+  }
+}
+function closePanels(){ $("fuPanel").classList.remove("open"); $("talkPanel").classList.remove("open"); }
+
+/* outcome buttons */
+Array.prototype.forEach.call(document.querySelectorAll("[data-outcome]"), function(b){
+  b.addEventListener("click", function(){
+    var o = b.getAttribute("data-outcome");
+    if(o === "Follow-up"){ closePanels(); $("fuPanel").classList.add("open"); setDefaultFu(); return; }
+    if(o === "Talked"){ closePanels(); $("talkPanel").classList.add("open"); $("noteBox").focus(); return; }
+    logOutcome(o);
+  });
+});
+$("btnTalkSave").addEventListener("click", function(){ logOutcome("Talked"); });
+$("btnTalkCancel").addEventListener("click", closePanels);
+$("btnFuCancel").addEventListener("click", closePanels);
+$("btnFuSave").addEventListener("click", function(){
+  var v = $("fuWhen").value;
+  if(!v){ toast("Pick a date &amp; time first"); return; }
+  logOutcome("Follow-up", new Date(v).getTime());
+});
+function setDefaultFu(){
+  var d = new Date(); d.setDate(d.getDate()+1); d.setHours(10,0,0,0);
+  var pad = function(n){ return String(n).padStart(2,"0"); };
+  $("fuWhen").value = d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+"T"+pad(d.getHours())+":"+pad(d.getMinutes());
+}
+Array.prototype.forEach.call(document.querySelectorAll("[data-fu]"), function(b){
+  b.addEventListener("click", function(){
+    var kind = b.getAttribute("data-fu"), d = new Date();
+    if(kind === "tomorrow-am"){ d.setDate(d.getDate()+1); d.setHours(10,0,0,0); }
+    if(kind === "tomorrow-pm"){ d.setDate(d.getDate()+1); d.setHours(15,0,0,0); }
+    if(kind === "2days"){ d.setDate(d.getDate()+2); d.setHours(10,0,0,0); }
+    if(kind === "nextweek"){ d.setDate(d.getDate()+7); d.setHours(10,0,0,0); }
+    logOutcome("Follow-up", d.getTime());
+  });
+});
+$("btnSkip").addEventListener("click", function(){ saveNoteFromBox(); advance(1); });
+$("btnPrev").addEventListener("click", function(){ saveNoteFromBox(); advance(-1); });
+$("btnNextTop").addEventListener("click", function(){ saveNoteFromBox(); advance(1); });
+$("noteBox").addEventListener("input", saveNoteFromBox);
+$("copyStrip").addEventListener("click", function(){
+  var lead = cur(); if(!lead) return;
+  var num = lead.cell || lead.phone;
+  if(num) copyText(num, fmtPhone(num));
+});
+$("btnCall").addEventListener("click", doCall);
+$("btnText").addEventListener("click", function(){
+  var lead = cur(); if(!lead) return;
+  var num = lead.cell || lead.phone; if(!num) return;
+  var tpl = S.emailTpls[S.activeEmailTpl];
+  var body = tpl ? fillTpl(tpl.body.split("\n").slice(0,3).join(" "), lead) : "";
+  handOff("sms:+" + intlPhone(num) + "?&body=" + encodeURIComponent(body));
+});
+$("btnWhats").addEventListener("click", function(){
+  var lead = cur(); if(!lead) return;
+  var num = lead.cell || lead.phone; if(!num) return;
+  var first = (lead.contact || "").split(" ")[0] || "there";
+  var msg = "Hi " + first + ", this is dispatch calling for " + lead.company + ". We help owner-operators keep steady loads without spending the day on load boards. Open to a quick chat?";
+  window.open("https://wa.me/" + intlPhone(num) + "?text=" + encodeURIComponent(msg), "_blank");
+});
+$("btnEmail").addEventListener("click", function(){
+  var lead = cur(); if(!lead || !lead.email) return;
+  var tpl = S.emailTpls[S.activeEmailTpl] || {subject:"Dispatch support for {company}", body:"Hi {name},"};
+  handOff("mailto:" + lead.email +
+    "?subject=" + encodeURIComponent(fillTpl(tpl.subject, lead)) +
+    "&body=" + encodeURIComponent(fillTpl(tpl.body, lead)));
+  toast("Opening your email app with the template filled in");
+});
+$("btnCopyEmail").addEventListener("click", function(){ var l = cur(); if(l && l.email) copyText(l.email, "email"); });
+$("btnCopyMC").addEventListener("click", function(){ var l = cur(); if(l && l.mc) copyText(l.mc, "MC " + l.mc); });
+$("btnCopyOpener").addEventListener("click", function(){
+  var lead = cur(); if(!lead) return;
+  copyText($("openerScript").textContent.replace(/[“”]/g,""), "call opener");
+});
+
+/* ================= import wiring ================= */
+function openImport(){ $("fileInput").click(); }
+$("btnImportTop").addEventListener("click", openImport);
+Array.prototype.forEach.call(document.querySelectorAll("[data-act='import']"), function(b){
+  b.addEventListener("click", openImport);
+});
+$("fileInput").addEventListener("change", function(){
+  var f = this.files && this.files[0];
+  if(!f) return;
+  var reader = new FileReader();
+  reader.onload = function(){ importCSVText(String(reader.result || "")); };
+  reader.readAsText(f);
+  this.value = "";
+});
+
+/* ================= tabs ================= */
+function switchView(name){
+  Array.prototype.forEach.call(document.querySelectorAll(".tab"), function(t){
+    t.classList.toggle("on", t.getAttribute("data-view") === name);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".view"), function(v){
+    v.classList.toggle("on", v.id === "view-" + name);
+  });
+  window.scrollTo({top: 0, behavior: "smooth"});
+}
+Array.prototype.forEach.call(document.querySelectorAll(".tab"), function(t){
+  t.addEventListener("click", function(){ switchView(t.getAttribute("data-view")); });
+});
+$("leadSearch").addEventListener("input", renderLeads);
+$("leadFilter").addEventListener("change", renderLeads);
+
+/* ================= exports ================= */
+$("btnExpDay").addEventListener("click", function(){
+  var t = todayLog().slice().sort(function(a,b){ return a.ts - b.ts; });
+  if(!t.length){ toast("No calls logged today yet — nothing to export."); return; }
+  var rows = t.map(function(e){
+    var l = S.leads.filter(function(x){ return x.id === e.leadId; })[0] || {};
+    return [new Date(e.ts).toLocaleString(), e.company, l.contact||"", fmtPhone(l.cell||l.phone), l.email||"", l.mc||"", e.outcome, e.followUpAt ? fmtFu(e.followUpAt) : "", e.note || l.notes || ""];
+  });
+  download("day-sheet_" + todayStr() + ".csv",
+    toCSV(["Time","Company","Contact","Phone","Email","MC","Outcome","Follow-up","Notes"], rows));
+  toast("<b>Day sheet exported</b> — " + rows.length + " calls");
+});
+$("btnExpFu").addEventListener("click", function(){
+  var fus = S.leads.filter(function(l){ return l.followUpAt; }).sort(function(a,b){ return a.followUpAt - b.followUpAt; });
+  if(!fus.length){ toast("No follow-ups scheduled — nothing to export."); return; }
+  var rows = fus.map(function(l){
+    return [fmtFu(l.followUpAt), l.company, l.contact, fmtPhone(l.cell||l.phone), l.email, l.mc, l.city, l.state, l.notes];
+  });
+  download("follow-ups_" + todayStr() + ".csv",
+    toCSV(["Follow-up when","Company","Contact","Phone","Email","MC","City","State","Notes"], rows));
+  toast("<b>Follow-ups exported</b> — " + rows.length + " leads");
+});
+$("btnExpAll").addEventListener("click", function(){
+  if(!S.leads.length){ toast("No leads loaded — nothing to export."); return; }
+  var rows = S.leads.map(function(l){
+    return [l.company, l.contact, fmtPhone(l.cell||l.phone), l.email, l.city, l.state, l.mc, l.usdot, l.grantDate, l.trailer, l.operation, l.trucks, l.drivers, l.miles, l.cargo, statusLabel(l), l.followUpAt ? fmtFu(l.followUpAt) : "", l.attempts, l.notes];
+  });
+  download("all-leads_" + todayStr() + ".csv",
+    toCSV(["Company","Contact","Phone","Email","City","State","MC","USDOT","Grant date","Equipment","Operation","Trucks","Drivers","Miles","Cargo","Status","Follow-up","Attempts","Notes"], rows));
+  toast("<b>All leads exported</b> — " + rows.length + " rows");
+});
+
+/* ================= setup / goal / add-lead modals ================= */
+function openOverlay(id){ $(id).classList.add("open"); }
+function closeOverlay(id){ $(id).classList.remove("open"); }
+$("btnSetup").addEventListener("click", function(){ openOverlay("setupOverlay"); });
+$("btnSetupClose").addEventListener("click", function(){ closeOverlay("setupOverlay"); });
+Array.prototype.forEach.call($("callModeSeg").querySelectorAll("[data-mode]"), function(b){
+  b.addEventListener("click", function(){
+    S.callMode = b.getAttribute("data-mode");
+    Array.prototype.forEach.call($("callModeSeg").querySelectorAll("[data-mode]"), function(x){
+      x.classList.toggle("on", x === b);
+    });
+    if(cur()) renderDialer();
+    toast(S.callMode === "rcweb" ? "Call button: RingCentral web" : "Call button: phone link (tel:)");
+  });
+});
+$("chkAutoCopy").addEventListener("change", function(){ S.autoCopy = this.checked; });
+$("chkAutoLog").addEventListener("change", function(){ S.autoLogCall = this.checked; });
+$("btnGoal").addEventListener("click", function(){ $("goalInput").value = S.goal; openOverlay("goalOverlay"); });
+$("btnGoalCancel").addEventListener("click", function(){ closeOverlay("goalOverlay"); });
+$("btnGoalSave").addEventListener("click", function(){
+  var v = parseInt($("goalInput").value, 10);
+  if(v > 0){ S.goal = v; renderHeader(); toast("Daily goal set to <b>" + v + " calls</b>"); }
+  closeOverlay("goalOverlay");
+});
+$("btnAddLead").addEventListener("click", function(){ openOverlay("addOverlay"); });
+$("btnAddCancel").addEventListener("click", function(){ closeOverlay("addOverlay"); });
+$("addLeadForm").addEventListener("submit", function(ev){
+  ev.preventDefault();
+  var lead = {
+    id: "L" + Date.now().toString(36), company: $("alCompany").value.trim(),
+    contact: $("alContact").value.trim(), phone: $("alPhone").value.trim(), cell: "",
+    email: $("alEmail").value.trim(), city: $("alCity").value.trim(),
+    state: $("alState").value.trim().toUpperCase(), mc: $("alMC").value.trim().replace(/^MC[-\s]*/i,""),
+    usdot: "", grantDate: "", trailer: $("alTrailer").value.trim(), operation: "",
+    trucks: "", drivers: "", miles: "", cargo: "",
+    status: "new", notes: "", followUpAt: null, attempts: 0, lastOutcome: ""
+  };
+  S.leads.push(lead);
+  this.reset(); closeOverlay("addOverlay");
+  toast("<b>" + esc(lead.company) + "</b> added to the list");
+  renderAll();
+});
+Array.prototype.forEach.call(document.querySelectorAll(".overlay"), function(o){
+  o.addEventListener("click", function(e){ if(e.target === o) o.classList.remove("open"); });
+});
+
+/* ================= template forms ================= */
+$("noteTplForm").addEventListener("submit", function(ev){
+  ev.preventDefault();
+  S.noteTpls.push({name: $("ntName").value.trim(), text: $("ntText").value.trim()});
+  this.reset(); renderTemplates(); toast("Note template added");
+});
+$("emailTplForm").addEventListener("submit", function(ev){
+  ev.preventDefault();
+  S.emailTpls.push({name: $("etName").value.trim(), subject: $("etSubject").value.trim(), body: $("etBody").value.trim()});
+  this.reset(); renderTemplates(); toast("Email template added");
+});
+
+/* ================= download this file ================= */
+$("btnDownload").addEventListener("click", function(){
+  fetch("index.html", {cache: "no-store"})
+    .then(function(r){ if(!r.ok) throw new Error("fetch failed"); return r.text(); })
+    .then(function(html){
+      download("lead-crm.html", html, "text/html;charset=utf-8");
+      toast("<b>Saved</b> — open lead-crm.html in Brave any time, no internet needed except fonts");
+    })
+    .catch(function(){
+      var html = "<!doctype html>\n" + document.documentElement.outerHTML;
+      download("lead-crm.html", html, "text/html;charset=utf-8");
+      toast("<b>Saved</b> — open lead-crm.html in Brave any time, no internet needed except fonts");
+    });
+});
+
+/* ================= keyboard ================= */
+document.addEventListener("keydown", function(e){
+  var tag = (e.target && e.target.tagName) || "";
+  if(tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || e.target.isContentEditable) return;
+  if(document.querySelector(".overlay.open")) return;
+  if(!$("view-dialer").classList.contains("on")) return;
+  var lead = cur(); if(!lead) return;
+  var k = e.key.toLowerCase();
+  if(k === "c"){ var num = lead.cell || lead.phone; if(num) copyText(num, fmtPhone(num)); }
+  else if(k === "enter"){ e.preventDefault(); doCall(); }
+  else if(k === "s"){ saveNoteFromBox(); advance(1); }
+  else if(k === "n"){ saveNoteFromBox(); advance(1); }
+  else if(k === "p"){ saveNoteFromBox(); advance(-1); }
+  else if(k === "1"){ logOutcome("No answer"); }
+  else if(k === "2"){ logOutcome("Not interested"); }
+  else if(k === "3"){ logOutcome("Interested"); }
+  else if(k === "4"){ closePanels(); $("talkPanel").classList.add("open"); }
+  else if(k === "5"){ closePanels(); $("fuPanel").classList.add("open"); setDefaultFu(); }
+});
+
+/* ================= starfield ================= */
+(function(){
+  var cv = $("stars"), ctx = cv.getContext("2d"), stars = [], W, H;
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function size(){
+    W = cv.width = window.innerWidth; H = cv.height = window.innerHeight;
+    stars = [];
+    var n = Math.min(130, Math.floor(W*H/14000));
+    for(var i=0;i<n;i++) stars.push({x: Math.random()*W, y: Math.random()*H*.75, r: Math.random()*1.3+.3, p: Math.random()*Math.PI*2, s: .4+Math.random()*.8});
+  }
+  function draw(t){
+    ctx.clearRect(0,0,W,H);
+    for(var i=0;i<stars.length;i++){
+      var st = stars[i];
+      var a = .25 + .55*Math.abs(Math.sin(t*.0004*st.s + st.p));
+      ctx.globalAlpha = a; ctx.fillStyle = "#ffe9c4";
+      ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    if(!reduce) requestAnimationFrame(draw);
+  }
+  size(); window.addEventListener("resize", size);
+  requestAnimationFrame(draw);
+})();
+
+/* keep local times / overdue badges fresh */
+setInterval(function(){ if(S.leads.length){ renderHeader(); } }, 60000);
+
+
+/* ================= themes ================= */
+(function(){
+  var sel = $("themeSelect");
+  function applyTheme(t){
+    if(!t) t = "black";
+    document.documentElement.setAttribute("data-theme", t);
+    var light = (t === "white" || t === "gray");
+    var meta = document.querySelector('meta[name="color-scheme"]');
+    if(meta) meta.setAttribute("content", light ? "light" : "dark");
+    if(sel) sel.value = t;
+    try{ localStorage.setItem("leadcrm-theme", t); }catch(e){}
+  }
+  var saved = null;
+  try{ saved = localStorage.getItem("leadcrm-theme"); }catch(e){}
+  applyTheme(saved || "black");
+  if(sel) sel.addEventListener("change", function(){ applyTheme(sel.value); });
+  window.applyTheme = applyTheme;
+})();
+
+/* ================= init ================= */
+loadProgress();
+$("btnClearSaved").addEventListener("click", function(){
+  if(!confirm("Clear all saved leads and calls from this browser? Export first if you want to keep them.")) return;
+  try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+  S.leads = []; S.log = []; S.idx = 0;
+  renderAll();
+  toast("Saved data cleared");
+});
+renderAll();
+if(restoredCount) toast("<b>Restored " + restoredCount + " saved leads</b> from this browser — no need to re-import.");
+</script>
+</body>
+</html>
